@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "511856634071",
+    "firebase_url": "https://cafeteria-instituto-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "cafeteria-instituto",
+    "storage_bucket": "cafeteria-instituto.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511856634071:android:f8178398224fb37d2ea892",
+        "android_client_info": {
+          "package_name": "com.example.cafeteria_instituto"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoKZHZcdYY5BQjMPyYMcNGBMuVekoURwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511856634071:android:dced4ec63c3efcf62ea892",
+        "android_client_info": {
+          "package_name": "com.example.coffee_shop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoKZHZcdYY5BQjMPyYMcNGBMuVekoURwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511856634071:android:786653236535c1d32ea892",
+        "android_client_info": {
+          "package_name": "com.mycompany.cafeteriainstituto"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoKZHZcdYY5BQjMPyYMcNGBMuVekoURwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
