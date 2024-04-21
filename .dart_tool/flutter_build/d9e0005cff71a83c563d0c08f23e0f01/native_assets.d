@@ -1,0 +1,1 @@
+ C:\\Users\\olive\\Downloads\\CafeteriaInstituto-master\\.dart_tool\\flutter_build\\d9e0005cff71a83c563d0c08f23e0f01\\native_assets.yaml: 

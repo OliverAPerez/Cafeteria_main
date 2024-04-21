@@ -1,0 +1,2 @@
+ninja: Entering directory `C:\Users\olive\AppData\Local\Pub\Cache\hosted\pub.dev\rive_common-0.3.3\android\.cxx\Debug\6p513r6u\x86_64'
+ninja: no work to do.

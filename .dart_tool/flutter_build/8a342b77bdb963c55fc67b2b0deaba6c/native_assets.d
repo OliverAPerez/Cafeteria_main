@@ -1,0 +1,1 @@
+ C:\\MEGAsync\\MEGAsync\\TFC\\PROYECTO\\CafeteriaInstituto-master\\.dart_tool\\flutter_build\\8a342b77bdb963c55fc67b2b0deaba6c\\native_assets.yaml: 
