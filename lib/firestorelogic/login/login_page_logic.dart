@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:coffee_shop/pages/main/main_page.dart';
-import 'package:coffee_shop/pages/perfil/perfil_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPageLogic {
   final TextEditingController emailController = TextEditingController();
@@ -46,6 +46,23 @@ class LoginPageLogic {
       if (currentUser != null) {
         String uid = currentUser.uid;
         bool isProfileComplete = await checkUserProfile(uid);
+
+        FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+        // Obtén el token de FCM
+        String? fcmToken = await messaging.getToken();
+
+        if (fcmToken != null) {
+          // Aquí puedes enviar el token a tu servidor
+          // Puedes hacer una solicitud HTTP a tu servidor con el token de FCM
+          // o guardar el token en la base de datos de Firebase, etc.
+        }
+
+        // También puedes escuchar los cambios en el token de FCM
+        messaging.onTokenRefresh.listen((newToken) {
+          // Aquí puedes enviar el nuevo token a tu servidor
+        });
+
         if (isProfileComplete) {
           // Cambia el índice del BottomNavigationBar a la posición de la página de perfil
           navbarIndex.value = 2;

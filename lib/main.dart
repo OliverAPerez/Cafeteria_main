@@ -9,10 +9,12 @@ import 'package:coffee_shop/pages/menu/menu_page.dart';
 import 'package:coffee_shop/pages/modificarperfil/modificar_perfil_page.dart';
 import 'package:coffee_shop/pages/perfil/perfil_page.dart';
 import 'package:coffee_shop/pages/recargasaldo/recarga_saldo_page.dart';
+import 'package:coffee_shop/services/messages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(
@@ -21,20 +23,28 @@ void main() async {
       statusBarBrightness: Brightness.dark, // Dark == white status bar -- for IOS.
     ),
   );
+
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
+  static final navigatorKey = GlobalKey<NavigatorState>();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    NotificationService notificationService = NotificationService();
+    notificationService.setupMessaging(context);
+    notificationService.requestPermission();
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'Cafeteria App',
           theme: ThemeData(
@@ -60,7 +70,7 @@ class MyApp extends StatelessWidget {
             '/recargarSaldo': (context) => const RecargaSaldoPage(),
             // Define la ruta para la página de historial de pedidos
             '/historialPedidos': (context) => HistorialPedidosPage(user: FirebaseAuth.instance.currentUser!),
-// Define la ruta para la página de historial de perfil
+            // Define la ruta para la página de historial de perfil
             '/perfil': (context) => ProfilePage(user: FirebaseAuth.instance.currentUser),
             // Define la ruta para la página de historial de recargas
             '/historialRecargas': (context) => const HistorialRecargasPage(),

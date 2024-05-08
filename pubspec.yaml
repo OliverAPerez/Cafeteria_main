@@ -50,13 +50,17 @@ dependencies:
   permission_handler: ^11.3.1
   fluttertoast: ^8.2.4
   flare_flutter: ^3.0.2
-  rive: ^0.13.1
+
   appcheck: ^1.1.0
   http: ^1.2.1
   firebaseapis: ^0.2.0
   google_fonts: ^6.2.1
   font_awesome_flutter: ^10.7.0
   transparent_image: ^2.0.1
+  shared_preferences: ^2.2.3
+  shared_preferences_android: ^2.2.2
+  firebase_messaging: ^14.9.1
+  flutter_local_notifications: ^17.1.1
 
   #flutter_web_plugins: any
 dev_dependencies:

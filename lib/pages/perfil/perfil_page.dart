@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coffee_shop/pages/creditcard/credit_card_page.dart';
 import 'package:coffee_shop/pages/historialpedidos/historial_pedidos_page.dart';
+import 'package:coffee_shop/pages/login/authPage.dart';
+import 'package:coffee_shop/pages/login/login_page.dart';
 import 'package:coffee_shop/pages/modificarperfil/modificar_perfil_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -216,25 +218,30 @@ class _ProfilePageState extends State<ProfilePage> {
                                 height: 10,
                               ),
                               GestureDetector(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Card(
-                                    color: Colors.white70,
-                                    margin: const EdgeInsets.only(left: 35, right: 35, bottom: 10),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                    child: const ListTile(
-                                      leading: Icon(
-                                        Icons.logout,
-                                        color: Colors.black54,
-                                      ),
-                                      title: Text(
-                                        'Cerrar sesión',
-                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                      ),
-                                      trailing: Icon(Icons.arrow_forward_ios_outlined),
+                                onTap: () async {
+                                  await FirebaseAuth.instance.signOut();
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const AuthPage()),
+                                  );
+                                },
+                                child: Card(
+                                  color: Colors.white70,
+                                  margin: const EdgeInsets.only(left: 35, right: 35, bottom: 10),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                  child: const ListTile(
+                                    leading: Icon(
+                                      Icons.logout,
+                                      color: Colors.black54,
                                     ),
-                                  ))
+                                    title: Text(
+                                      'Cerrar sesión',
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+                                    trailing: Icon(Icons.arrow_forward_ios_outlined),
+                                  ),
+                                ),
+                              )
                             ],
                           ))
                         ],

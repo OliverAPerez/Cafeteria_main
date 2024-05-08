@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CarritoLogic {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -292,17 +294,30 @@ class CarritoLogic {
 
   Future<String> _createOrderDocument(User user, List<QueryDocumentSnapshot> cartItems) async {
     String userId = user.uid;
+
+    // Recuperar la información del usuario de Firestore
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>? ?? {};
+
+    // Obtén el token de FCM
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
+
     Map<String, dynamic> orderData = {
       'fecha_pedido': Timestamp.now(),
       'productos': cartItems.map((item) => item.data()).toList(), // Lista de productos en el pedido
-      'precio_total': calculateTotal(cartItems),
+      'precio total': calculateTotal(cartItems),
+      'nombre': userData['nombre'], // Añadir el nombre del usuario
+      'id': userId, // Añadir el ID del usuario
+      'fcmToken': fcmToken, // Añadir el token de FCM
     };
+
+    // El resto de tu código...
 
     // Crear un nuevo documento de pedido en la subcolección 'historialpedidos' del usuario
     DocumentReference orderDoc = await FirebaseFirestore.instance.collection('Users').doc(userId).collection('historialpedidos').add(orderData);
 
     // Crear un nuevo documento de pedido en la subcolección 'PorProcesar' de 'pedidosonline' en la colección 'Pedidos'
-    await FirebaseFirestore.instance.collection('Pedidos').doc('pedidosonline').collection('PorProcesar').doc(userId).set(orderData);
+    await FirebaseFirestore.instance.collection('Pedidos').doc('pedidosonline').collection('PorProcesar').add(orderData);
 
     // Devolver el ID del pedido
     return orderDoc.id;
