@@ -14,7 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(
@@ -28,7 +28,12 @@ void main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => FavoriteModel(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -49,7 +54,7 @@ class MyApp extends StatelessWidget {
           title: 'Cafeteria App',
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              seedColor: Color.fromARGB(255, 33, 104, 80),
+              seedColor: const Color.fromARGB(255, 33, 104, 80),
             ),
             useMaterial3: true,
           ),

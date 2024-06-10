@@ -11,7 +11,7 @@ class MainPage extends StatefulWidget {
   final ValueNotifier<int> navbarIndex;
   CarritoLogic carritoLogic = CarritoLogic();
 
-  MainPage({required this.navbarIndex, Key? key}) : super(key: key);
+  MainPage({required this.navbarIndex, super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -22,7 +22,7 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> _children = [
     MenuPage(), // Menu()
-    CarritoPage(), // Carrito()
+    const CarritoPage(), // Carrito()
     FavoritesPage(), // Favoritos()
     ProfilePage(user: FirebaseAuth.instance.currentUser), // Perfil()
   ];
@@ -67,7 +67,7 @@ class _MainPageState extends State<MainPage> {
                           return Container(); // Muestra un contenedor vacío mientras se espera el resultado
                         } else {
                           if (snapshot.hasError) {
-                            return Icon(Icons.error); // Muestra un ícono de error si hay un error
+                            return const Icon(Icons.error); // Muestra un ícono de error si hay un error
                           } else {
                             return Positioned(
                               right: 0,
@@ -77,7 +77,7 @@ class _MainPageState extends State<MainPage> {
                                 foregroundColor: Colors.white,
                                 child: Text(
                                   snapshot.data!.length.toString(),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12,
                                   ),

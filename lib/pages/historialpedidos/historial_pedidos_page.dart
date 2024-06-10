@@ -33,7 +33,12 @@ class _HistorialPedidosPageState extends State<HistorialPedidosPage> {
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('Users').doc(widget.user.uid).collection('historialpedidos').snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(widget.user.uid)
+                  .collection('historialpedidos')
+                  .orderBy('fecha_pedido', descending: true) // Ordena los documentos por 'fecha_pedido' de más reciente a más antiguo
+                  .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));

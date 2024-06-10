@@ -6,16 +6,17 @@ class MenuItem extends StatefulWidget {
   final String? imageUrl;
   final bool isFavorite;
   final VoidCallback addToCart;
+  final VoidCallback toggleFavorite;
 
   const MenuItem({
-    Key? key,
+    super.key,
     required this.name,
     required this.price,
     required this.imageUrl,
     required this.isFavorite,
     required this.addToCart,
-    required Null Function() toggleFavorite,
-  }) : super(key: key);
+    required this.toggleFavorite,
+  });
 
   @override
   _MenuItemState createState() => _MenuItemState();
@@ -34,6 +35,7 @@ class _MenuItemState extends State<MenuItem> {
     setState(() {
       isFavorite = !isFavorite;
     });
+    widget.toggleFavorite();
   }
 
   @override

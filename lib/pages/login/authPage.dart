@@ -1,5 +1,4 @@
 import 'package:coffee_shop/pages/main/main_page.dart';
-import 'package:coffee_shop/pages/perfil/perfil_page.dart';
 import 'package:coffee_shop/pages/usuario/user_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

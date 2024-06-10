@@ -169,7 +169,7 @@ class _FirestoreMenuState extends State<FirestoreMenu> {
 class FavoriteIconToggle extends StatefulWidget {
   final Widget Function(bool isFavorite, VoidCallback toggleFavorite) builder;
 
-  const FavoriteIconToggle({Key? key, required this.builder}) : super(key: key);
+  const FavoriteIconToggle({super.key, required this.builder});
 
   @override
   _FavoriteIconToggleState createState() => _FavoriteIconToggleState();

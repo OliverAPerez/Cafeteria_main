@@ -59,8 +59,10 @@ dependencies:
   transparent_image: ^2.0.1
   shared_preferences: ^2.2.3
   shared_preferences_android: ^2.2.2
-  firebase_messaging: ^14.9.1
+  firebase_messaging: ^14.9.4
   flutter_local_notifications: ^17.1.1
+  collection: ^1.18.0
+  logger: ^2.3.0
 
   #flutter_web_plugins: any
 dev_dependencies:

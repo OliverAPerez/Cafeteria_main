@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class MenuPage extends StatefulWidget {
   final String? category;
@@ -41,160 +42,217 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 67, 77, 69),
-        title: const Text(
-          'Menú Cafetería',
-          style: TextStyle(color: Colors.white),
+    return Consumer<FavoriteModel>(builder: (context, favoriteModel, child) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 67, 77, 69),
+          title: const Text(
+            'Menú Cafetería',
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
+          elevation: 0,
         ),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white, // Color de fondo del contenedor de búsqueda
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                controller: searchController,
-                decoration: const InputDecoration(
-                  hintText: 'Buscar productos',
-                  prefixIcon: Icon(Icons.search),
-                  border: InputBorder.none,
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white, // Color de fondo del contenedor de búsqueda
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                onChanged: (value) {
-                  // Manejar la lógica de búsqueda aquí
-                },
-              ),
-            ),
-            DefaultTabController(
-              length: categories.length,
-              child: Column(
-                children: <Widget>[
-                  //MARK: Sección de pestañas
-                  Container(
-                    constraints: const BoxConstraints.expand(height: 50),
-                    child: TabBar(
-                      isScrollable: true,
-                      tabs: categories.map((String category) => Tab(text: category)).toList(),
-                      onTap: (index) {
-                        setState(() {
-                          selectedCategory = categories[index];
-                        });
-                      },
-                    ),
+                child: TextField(
+                  controller: searchController,
+                  decoration: const InputDecoration(
+                    hintText: 'Buscar productos',
+                    prefixIcon: Icon(Icons.search),
+                    border: InputBorder.none,
                   ),
+                  onChanged: (value) {
+                    // Manejar la lógica de búsqueda aquí
+                  },
+                ),
+              ),
+              DefaultTabController(
+                length: categories.length,
+                child: Column(
+                  children: <Widget>[
+                    //MARK: Sección de pestañas
+                    Container(
+                      constraints: const BoxConstraints.expand(height: 50),
+                      child: TabBar(
+                        isScrollable: true,
+                        tabs: categories.map((String category) => Tab(text: category)).toList(),
+                        onTap: (index) {
+                          setState(() {
+                            selectedCategory = categories[index];
+                          });
+                        },
+                      ),
+                    ),
 
-                  // MARK: Sección de contenido de pestañas
-                  SizedBox(
-                    height: 700, // Ajusta esta altura según tus necesidades
-                    child: TabBarView(
-                      children: categories.map((String category) {
-                        return FutureBuilder<List<DocumentSnapshot>>(
-                          future: getItems(category),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            } else {
-                              return Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: GridView.builder(
-                                  physics: const ScrollPhysics(),
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    childAspectRatio: 4 / 6,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                  ),
-                                  itemCount: snapshot.data!.length,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    final itemData = snapshot.data![index].data() as Map<String, dynamic>;
-                                    return MenuItem(
-                                      name: itemData['nombre'] ?? 'Nombre no disponible',
-                                      price: (itemData['precio'] as num?)?.toDouble(),
-                                      imageUrl: itemData['image'] as String?,
-                                      isFavorite: itemData['isFavorite'] as bool? ?? false,
-                                      toggleFavorite: () {
-                                        unawaited(() async {
+                    // MARK: Sección de contenido de pestañas
+                    SizedBox(
+                      height: 700, // Ajusta esta altura según tus necesidades
+                      child: TabBarView(
+                        children: categories.map((String category) {
+                          return FutureBuilder<List<DocumentSnapshot>>(
+                            future: getItems(category),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                return Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: GridView.builder(
+                                    physics: const ScrollPhysics(),
+                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 4 / 6,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10,
+                                    ),
+                                    itemCount: snapshot.data!.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      final itemData = snapshot.data![index].data() as Map<String, dynamic>;
+                                      return MenuItem(
+                                        name: itemData['nombre'] ?? 'Nombre no disponible',
+                                        price: (itemData['precio'] as num?)?.toDouble(),
+                                        imageUrl: itemData['image'] as String?,
+                                        // isFavorite: itemData['isFavorite'] as bool? ?? false,
+                                        isFavorite: favoriteModel._favoriteItems[itemData['nombre']] ?? false,
+                                        toggleFavorite: () {
+                                          favoriteModel.toggleFavoriteStatus(itemData['nombre']);
+                                          unawaited(() async {
+                                            try {
+                                              // Obtén el usuario actual
+                                              final user = FirebaseAuth.instance.currentUser;
+                                              if (user != null) {
+                                                // Obtén la colección de favoritos del usuario
+                                                FirebaseFirestore.instance.collection('Users').doc(user.uid).collection('favoritos').where('nombre', isEqualTo: itemData['nombre']).get().then((snapshot) {
+                                                  if (snapshot.docs.isNotEmpty) {
+                                                    // Si el producto está en la colección de favoritos, actualiza el estado de isFavorite a true
+                                                    setState(() {
+                                                      itemData['isFavorite'] = true;
+                                                    });
+                                                  }
+                                                });
+                                              }
+                                              print('Usuario: $user');
+                                              if (user != null) {
+                                                final productSnapshot = await FirebaseFirestore.instance.collection('Productos').doc('tipos').collection(category).where('nombre', isEqualTo: itemData['nombre']).get();
+                                                print('Producto: ${productSnapshot.docs}');
+                                                if (productSnapshot.docs.isNotEmpty) {
+                                                  final productData = productSnapshot.docs[0].data();
+                                                  print('Datos del producto: $productData');
+
+                                                  final favoriteSnapshot = await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection('favoritos').where('nombre', isEqualTo: itemData['nombre']).get();
+                                                  print('Favoritos: ${favoriteSnapshot.docs}');
+                                                  if (favoriteSnapshot.docs.isNotEmpty) {
+                                                    favoriteSnapshot.docs[0].reference.delete().then((value) => Fluttertoast.showToast(msg: 'Producto eliminado de favoritos')).catchError((error) => Fluttertoast.showToast(msg: 'Error al eliminar el producto de favoritos: $error'));
+                                                  } else {
+                                                    FirebaseFirestore.instance
+                                                        .collection('Users')
+                                                        .doc(user.uid)
+                                                        .collection('favoritos')
+                                                        .add({
+                                                          'nombre': productData['nombre'],
+                                                          'precio': productData['precio'],
+                                                          'image': productData['image'],
+                                                          'isFavorite': true,
+                                                        })
+                                                        .then((value) => Fluttertoast.showToast(msg: 'Producto añadido a favoritos'))
+                                                        .catchError((error) => Fluttertoast.showToast(msg: 'Error al añadir el producto a favoritos: $error'));
+                                                  }
+                                                } else {
+                                                  Fluttertoast.showToast(msg: 'Producto no encontrado');
+                                                }
+                                              } else {
+                                                Fluttertoast.showToast(msg: 'Necesitas iniciar sesión para añadir productos a favoritos');
+                                              }
+                                            } catch (e) {
+                                              print('Se produjo un error: $e');
+                                            }
+                                          }());
+                                        },
+                                        addToCart: () async {
                                           final user = FirebaseAuth.instance.currentUser;
                                           if (user != null) {
-                                            // Buscamos el producto en la colección de productos por su nombre.
-                                            final productSnapshot = await FirebaseFirestore.instance.collection('Productos').doc('tipos').collection(category).where('nombre', isEqualTo: itemData['nombre']).get();
-                                            print('nombre: ${itemData['nombre']}');
-                                            if (productSnapshot.docs.isNotEmpty) {
-                                              final productData = productSnapshot.docs[0].data();
+                                            final cartCollection = FirebaseFirestore.instance.collection('Carrito').doc(user.uid).collection('Productos');
 
-                                              // Buscamos el producto en la colección de favoritos del usuario por su nombre.
-                                              final favoriteSnapshot = await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection('favoritos').where('nombre', isEqualTo: itemData['nombre']).get();
+                                            final productName = itemData['nombre'];
+                                            final productQuery = await cartCollection.where('nombre', isEqualTo: productName).get();
 
-                                              if (favoriteSnapshot.docs.isNotEmpty) {
-                                                // Si el producto ya es favorito, lo eliminamos de los favoritos.
-                                                favoriteSnapshot.docs[0].reference.delete().then((value) => Fluttertoast.showToast(msg: 'Producto eliminado de favoritos')).catchError((error) => Fluttertoast.showToast(msg: 'Error al eliminar el producto de favoritos: $error'));
-                                              } else {
-                                                // Si el producto no es favorito, lo agregamos a los favoritos.
-                                                FirebaseFirestore.instance
-                                                    .collection('Users')
-                                                    .doc(user.uid)
-                                                    .collection('favoritos')
-                                                    .add({
-                                                      'nombre': productData['nombre'],
-                                                      'precio': productData['precio'],
-                                                      'image': productData['image'],
-                                                      'isFavorite': true,
-                                                    })
-                                                    .then((value) => Fluttertoast.showToast(msg: 'Producto añadido a favoritos'))
-                                                    .catchError((error) => Fluttertoast.showToast(msg: 'Error al añadir el producto a favoritos: $error'));
-                                              }
+                                            if (productQuery.docs.isEmpty) {
+                                              // El producto no está en el carrito, lo agregamos
+                                              cartCollection
+                                                  .add({
+                                                    'nombre': productName,
+                                                    'precio': itemData['precio'],
+                                                    'image': itemData['image'],
+                                                    'isFavorite': itemData['isFavorite'],
+                                                    'quantity': 1, // Agregamos un campo de cantidad
+                                                  })
+                                                  .then((value) => Fluttertoast.showToast(msg: 'Producto añadido al carrito'))
+                                                  .catchError((error) => Fluttertoast.showToast(msg: 'Error al añadir el producto: $error'));
                                             } else {
-                                              Fluttertoast.showToast(msg: 'Producto no encontrado');
+                                              // El producto ya está en el carrito, aumentamos la cantidad
+                                              final doc = productQuery.docs.first;
+                                              cartCollection
+                                                  .doc(doc.id)
+                                                  .update({
+                                                    'quantity': doc['quantity'] + 1,
+                                                  })
+                                                  .then((value) => Fluttertoast.showToast(msg: 'Cantidad de producto actualizada'))
+                                                  .catchError((error) => Fluttertoast.showToast(msg: 'Error al actualizar la cantidad del producto: $error'));
                                             }
                                           } else {
-                                            Fluttertoast.showToast(msg: 'Necesitas iniciar sesión para añadir productos a favoritos');
+                                            Fluttertoast.showToast(msg: 'Necesitas iniciar sesión para añadir productos al carrito');
                                           }
-                                        }());
-                                      },
-                                      addToCart: () {
-                                        final user = FirebaseAuth.instance.currentUser;
-                                        if (user != null) {
-                                          FirebaseFirestore.instance
-                                              .collection('Carrito')
-                                              .doc(user.uid)
-                                              .collection('Productos')
-                                              .add({
-                                                'nombre': itemData['nombre'],
-                                                'precio': itemData['precio'],
-                                                'image': itemData['image'],
-                                                'isFavorite': itemData['isFavorite'],
-                                              })
-                                              .then((value) => Fluttertoast.showToast(msg: 'Producto añadido al carrito'))
-                                              .catchError((error) => Fluttertoast.showToast(msg: 'Error al añadir el producto: $error'));
-                                        } else {
-                                          Fluttertoast.showToast(msg: 'Necesitas iniciar sesión para añadir productos al carrito');
-                                        }
-                                      },
-                                    );
-                                  },
-                                ),
-                              );
-                            }
-                          },
-                        );
-                      }).toList(),
+                                        },
+                                      );
+                                    },
+                                  ),
+                                );
+                              }
+                            },
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
+  }
+}
+
+class FavoriteModel extends ChangeNotifier {
+  final Map<String, bool> _favoriteItems = {};
+
+  Future<bool> isFavorite(String itemId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final favoriteSnapshot = await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection('favoritos').where('nombre', isEqualTo: itemId).get();
+      if (favoriteSnapshot.docs.isNotEmpty) {
+        return true;
+      }
+    }
+    return _favoriteItems[itemId] ?? false;
+  }
+
+  void toggleFavoriteStatus(String? itemName) {
+    if (itemName != null && _favoriteItems.containsKey(itemName)) {
+      _favoriteItems[itemName] = !_favoriteItems[itemName]!;
+    } else if (itemName != null) {
+      _favoriteItems[itemName] = true;
+    }
   }
 }

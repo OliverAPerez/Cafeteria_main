@@ -4,11 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CarritoLogic {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  StreamController<double> totalController = StreamController<double>();
 
   Stream<List<QueryDocumentSnapshot>> getCartItems() {
     final user = _auth.currentUser;
@@ -20,18 +20,6 @@ class CarritoLogic {
 
     // Utiliza el método snapshots() para obtener un Stream de los cambios en la colección del carrito
     return cartRef.snapshots().map((snapshot) => snapshot.docs.toList());
-  }
-
-  double calculateTotal(List<QueryDocumentSnapshot> cartItems) {
-    double total = 0.0;
-    for (var item in cartItems) {
-      final data = item.data();
-      if (data != null && (data as Map<String, dynamic>).containsKey('precio')) {
-        double itemTotal = (data)['precio'].toDouble();
-        total += itemTotal;
-      }
-    }
-    return total;
   }
 
   Future<void> showOrderTicket(BuildContext context, String orderId, List<QueryDocumentSnapshot> cartItems) async {
@@ -115,21 +103,22 @@ class CarritoLogic {
                         final itemData = item.data() as Map<String, dynamic>;
                         final name = itemData['nombre'] ?? 'Nombre no disponible';
                         final price = (itemData['precio'] as num?)?.toDouble();
+                        final quantity = itemData['cantidad'] as int? ?? 1; // Asume 1 si la cantidad no está disponible
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '$name',
+                              '$name x $quantity', // Muestra la cantidad junto al nombre
                               style: const TextStyle(fontSize: 14),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '€${price?.toStringAsFixed(2)}',
+                              '€${(price! * quantity).toStringAsFixed(2)}', // Multiplica el precio por la cantidad
                               style: const TextStyle(fontSize: 14),
                             ),
                           ],
                         );
-                      }).toList(),
+                      }),
                       const SizedBox(height: 16),
                       const Divider(thickness: 1),
                       const SizedBox(height: 16),
@@ -183,65 +172,155 @@ class CarritoLogic {
     return cartSnapshot.size;
   }
 
-  Widget buildCartItem(BuildContext context, QueryDocumentSnapshot item) {
+  double calculateTotal(List<QueryDocumentSnapshot> cartItems) {
+    double total = 0.0;
+    for (var item in cartItems) {
+      final data = item.data();
+      if (data != null && (data as Map<String, dynamic>).containsKey('precio')) {
+        double itemPrice = (data)['precio'].toDouble();
+        int quantity = (data)['quantity'] ?? 1; // Asume una cantidad por defecto de 1 si no se especifica
+        total += itemPrice * quantity;
+      }
+    }
+    return total;
+  }
+
+  Future<void> updateTotal() async {
+    Stream<List<QueryDocumentSnapshot>> stream = getCartItems();
+    List<QueryDocumentSnapshot> cartItems = await stream.first;
+    double total = calculateTotal(cartItems);
+    totalController.add(total);
+  }
+
+  Widget buildCartItem(BuildContext context, QueryDocumentSnapshot item, {VoidCallback? onQuantityChanged}) {
     final itemData = item.data() as Map<String, dynamic>;
     final name = itemData['nombre'] ?? 'Nombre no disponible';
     final price = (itemData['precio'] as num?)?.toDouble();
     final imageUrl = itemData['image'] as String?;
+    int quantity = itemData['quantity'] ?? 1; // Asume una cantidad por defecto de 1
 
     return Card(
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: imageUrl != null ? Image.network(imageUrl, width: 50, height: 50, fit: BoxFit.cover) : null,
-        ),
-        title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: price != null ? Text('€${price.toStringAsFixed(2)}', style: TextStyle(color: Colors.brown.shade600)) : null,
-        trailing: TextButton.icon(
-          onPressed: () async {
-            await item.reference.delete();
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Producto eliminado del carrito')));
-          },
-          icon: const Icon(Icons.highlight_remove_sharp, color: Colors.red),
-          label: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: imageUrl != null ? Image.network(imageUrl, width: 60, height: 60, fit: BoxFit.cover) : Container(width: 60, height: 60, color: Colors.grey[300], child: Icon(Icons.image, size: 40, color: Colors.grey[600])),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      if (price != null) Text('€${price.toStringAsFixed(2)}', style: TextStyle(color: Colors.green.shade700, fontSize: 16)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.remove, color: Colors.redAccent),
+                      onPressed: quantity > 1
+                          ? () {
+                              item.reference.update({'quantity': quantity - 1}).then((_) {
+                                quantity -= 1;
+                                onQuantityChanged!();
+                                // Aquí se llama a la función para actualizar el total
+                                updateTotal();
+                                print('Cantidad actualizada a $quantity');
+                                print('Total actualizado a ${calculateTotal([item])}');
+                              });
+                            }
+                          : null,
+                    ),
+                    Text('$quantity', style: const TextStyle(fontSize: 16)),
+                    IconButton(
+                      icon: const Icon(Icons.add, color: Colors.green),
+                      onPressed: () {
+                        item.reference.update({'quantity': quantity + 1}).then((_) {
+                          quantity += 1;
+                          onQuantityChanged!();
+                          // Aquí se llama a la función para actualizar el total
+                          updateTotal();
+                          print('Cantidad actualizada a $quantity');
+                          print('Total actualizado a ${calculateTotal([item])}');
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                TextButton.icon(
+                  onPressed: () async {
+                    await item.reference.delete();
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Producto eliminado del carrito')));
+                  },
+                  icon: const Icon(Icons.delete, color: Colors.redAccent),
+                  label: const Text('Eliminar', style: TextStyle(color: Colors.redAccent)),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
   Future<void> createOrder(BuildContext context, List<QueryDocumentSnapshot> cartItems) async {
-    User? user = FirebaseAuth.instance.currentUser;
+    try {
+      print('Inicio de createOrder');
+      User? user = FirebaseAuth.instance.currentUser;
+      print('Usuario obtenido: $user');
 
-    if (user != null && cartItems.isNotEmpty) {
-      double total = calculateTotal(cartItems);
-      // Verificar si el usuario tiene suficiente saldo para realizar el pedido
-      bool hasEnoughBalance = await _checkBalance(total);
+      if (user != null && cartItems.isNotEmpty) {
+        double total = calculateTotal(cartItems);
+        print('Total calculado: $total');
+        // Verificar si el usuario tiene suficiente saldo para realizar el pedido
+        bool hasEnoughBalance = await _checkBalance(total);
+        print('Verificación de saldo: $hasEnoughBalance');
 
-      if (hasEnoughBalance) {
-        // Mostrar la animación de pago (aquí debes implementar tu propia lógica de animación)
-        await _showPaymentAnimation(context);
+        if (hasEnoughBalance) {
+          // Mostrar la animación de pago (aquí debes implementar tu propia lógica de animación)
+          await _showPaymentAnimation(context);
+          print('Animación de pago mostrada');
 
-        // Crear el pedido
-        String orderId = await _createOrderDocument(user, cartItems);
-        await showOrderTicket(context, orderId, cartItems);
-        await _deductFromBalance(total);
+          // Crear el pedido
+          String orderId = await _createOrderDocument(user, cartItems);
+          print('Pedido creado con ID: $orderId');
+          await showOrderTicket(context, orderId, cartItems);
+          print('Ticket de pedido mostrado');
+          await _deductFromBalance(total);
+          print('Saldo deducido');
 
-        // Vaciar el carrito inmediatamente
-        await emptyCart();
-        print('Pedido creado con ID: $orderId');
-        print('Carrito vaciado');
+          // Vaciar el carrito inmediatamente
+          await emptyCart();
+          print('Carrito vaciado');
 
-        // Espera un poco antes de navegar a la página de resumen del pedido
-        await Future.delayed(const Duration(seconds: 1));
+          // Espera un poco antes de navegar a la página de resumen del pedido
+          await Future.delayed(const Duration(seconds: 1));
+          print('Retraso completado');
 
-        // Navegar a la página de resumen del pedido
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saldo insuficiente, por favor recarga.')));
+          // Navegar a la página de resumen del pedido
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saldo insuficiente, por favor recarga.')));
+          print('Saldo insuficiente');
+        }
       }
+    } catch (e) {
+      print('Error en createOrder: $e');
     }
   }
 

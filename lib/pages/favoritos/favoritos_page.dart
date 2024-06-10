@@ -25,7 +25,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 67, 77, 69),
+        backgroundColor: const Color.fromARGB(255, 67, 77, 69),
         title: const Text(
           'Favoritos',
           style: TextStyle(color: Colors.white),

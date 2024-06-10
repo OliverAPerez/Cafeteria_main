@@ -1,8 +1,6 @@
-import 'dart:ui';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -17,7 +15,7 @@ class NotificationService {
 
   Future<void> _onSelectNotification(String? payload, BuildContext context) async {
     if (payload != null) {
-      debugPrint('notification payload: ' + payload);
+      debugPrint('notification payload: $payload');
     }
 
     // Muestra un diálogo con los detalles del pedido
@@ -25,11 +23,11 @@ class NotificationService {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Detalles del pedido'),
+          title: const Text('Detalles del pedido'),
           content: Text('Pedido ID: $payload'), // Aquí puedes mostrar más detalles sobre el pedido
           actions: <Widget>[
             TextButton(
-              child: Text('Cerrar'),
+              child: const Text('Cerrar'),
               onPressed: () {
                 Navigator.of(context).pop();
               },

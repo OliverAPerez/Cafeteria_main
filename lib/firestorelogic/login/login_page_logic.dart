@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPageLogic {
   final TextEditingController emailController = TextEditingController();
@@ -84,7 +83,7 @@ class LoginPageLogic {
       showmessage(context, e.toString());
     } finally {
       // Cerrar el diálogo después de un breve retraso para asegurarse de que se cierre el diálogo
-      if (context != null && Navigator.canPop(context)) {
+      if (Navigator.canPop(context)) {
         Navigator.of(context, rootNavigator: true).pop(); // Cierra el diálogo
       }
       if (ModalRoute.of(context)?.isCurrent ?? false) {

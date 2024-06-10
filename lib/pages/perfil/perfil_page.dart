@@ -2,14 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coffee_shop/pages/creditcard/credit_card_page.dart';
 import 'package:coffee_shop/pages/historialpedidos/historial_pedidos_page.dart';
 import 'package:coffee_shop/pages/login/authPage.dart';
-import 'package:coffee_shop/pages/login/login_page.dart';
 import 'package:coffee_shop/pages/modificarperfil/modificar_perfil_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfilePage extends StatefulWidget {
   final User? user;
-  const ProfilePage({Key? key, this.user}) : super(key: key);
+  const ProfilePage({super.key, this.user});
   @override
   State<StatefulWidget> createState() => _ProfilePageState();
 }

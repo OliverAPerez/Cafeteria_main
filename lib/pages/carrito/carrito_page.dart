@@ -23,7 +23,7 @@ class _CarritoPageState extends State<CarritoPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Carrito de Compras'),
-        backgroundColor: Color.fromRGBO(5, 116, 38, 1),
+        backgroundColor: const Color.fromRGBO(5, 116, 38, 1),
       ),
       body: StreamBuilder<List<QueryDocumentSnapshot>>(
         stream: _carritoLogic.getCartItems(),
@@ -48,10 +48,10 @@ class _CarritoPageState extends State<CarritoPage> {
                 ),
               ),
               Container(
-                color: Color.fromRGBO(5, 116, 38, 1),
+                color: const Color.fromRGBO(5, 116, 38, 1),
                 child: ListTile(
-                  title: Text('Total', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20, color: const Color.fromARGB(255, 255, 255, 255))),
-                  trailing: Text('€${total.toStringAsFixed(2)}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 255, 255))),
+                  title: const Text('Total', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20, color: Color.fromARGB(255, 255, 255, 255))),
+                  trailing: Text('€${total.toStringAsFixed(2)}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 255, 255))),
                   subtitle: Center(
                     child: ElevatedButton(
                       onPressed: () async {
@@ -81,10 +81,10 @@ class _CarritoPageState extends State<CarritoPage> {
                           }
                         }
                       },
-                      child: const Text('Pagar', style: TextStyle(fontSize: 18)),
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white, backgroundColor: Color.fromRGBO(51, 51, 51, 1), // foreground
+                        foregroundColor: Colors.white, backgroundColor: const Color.fromRGBO(51, 51, 51, 1), // foreground
                       ),
+                      child: const Text('Pagar', style: TextStyle(fontSize: 18)),
                     ),
                   ),
                 ),

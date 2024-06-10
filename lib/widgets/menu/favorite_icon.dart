@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class FirebaseLogicWidget extends StatefulWidget {
   final Widget Function(CollectionReference cartRef) builder;
 
-  const FirebaseLogicWidget({Key? key, required this.builder}) : super(key: key);
+  const FirebaseLogicWidget({super.key, required this.builder});
 
   @override
   _FirebaseLogicWidgetState createState() => _FirebaseLogicWidgetState();

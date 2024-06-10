@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CreditCardsPage extends StatelessWidget {
-  const CreditCardsPage({Key? key});
+  const CreditCardsPage({super.key, Key? customKey});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class CreditCardsPage extends StatelessWidget {
               const SizedBox(height: 15), // Agrega espacio entre las tarjetas de crédito
               _buildCreditCard(color: const Color(0xFF000000), cardExpiration: "05/2024", cardHolder: "HOUSSEM SELMI", cardNumber: "9874 4785 XXXX 6548"),
               const SizedBox(height: 15), // Agrega espacio entre las tarjetas de crédito
-              _buildAddCardButton(icon: const Icon(Icons.add), color: Color.fromARGB(255, 90, 182, 57)),
+              _buildAddCardButton(icon: const Icon(Icons.add), color: const Color.fromARGB(255, 90, 182, 57)),
             ],
           ),
         ),
@@ -41,14 +41,14 @@ class CreditCardsPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 8.0, top: 16.0),
           child: Text(
-            '$title',
+            title,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
         Padding(
           padding: const EdgeInsets.only(left: 8.0, bottom: 16.0),
           child: Text(
-            '$subTitle',
+            subTitle,
             style: const TextStyle(fontSize: 11, color: Colors.black45),
           ),
         )
@@ -72,7 +72,7 @@ class CreditCardsPage extends StatelessWidget {
           children: <Widget>[
             _buildLogosBlock(),
             Text(
-              '$cardNumber',
+              cardNumber,
               style: const TextStyle(color: Colors.white, fontSize: 21, fontFamily: 'CourrierPrime'),
             ),
             Row(
@@ -114,11 +114,11 @@ class CreditCardsPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          '$label',
+          label,
           style: const TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold),
         ),
         Text(
-          '$value',
+          value,
           style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
         )
       ],

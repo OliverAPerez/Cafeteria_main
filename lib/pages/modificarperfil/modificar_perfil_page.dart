@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 class ModificarPerfilPage extends StatefulWidget {
   final User? user;
 
-  const ModificarPerfilPage({Key? key, this.user}) : super(key: key);
+  const ModificarPerfilPage({super.key, this.user});
 
   @override
   State<ModificarPerfilPage> createState() => _ModificarPerfilPageState();
